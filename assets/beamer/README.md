@@ -9,22 +9,21 @@
 这些图片建议保留：
 
 - `base/01_seed-42_watercolor-style-a-small-boat-on-a-mountain-lake.png`
-- `base/02_seed-42_watercolor-style-a-misty-lake-after-rain.png`
+- `base/02_seed-42_watercolor-style-a-snowy-forest-path.png`
 - `base/03_seed-42_watercolor-style-a-quiet-village-with-a-stone-bridge.png`
 - `base/04_seed-42_watercolor-style-pine-trees-beside-a-lake-at-sunset.png`
 - `base/05_seed-42_watercolor-style-wildflowers-beside-a-peaceful-river.png`
 
 ## 数据集示例图
 
-`examples/` 中是汇报用的数据集方向示例图。后续如果手动找到更合适的图片，只需要替换同名文件即可，不需要改 Beamer 源码。
+`manual/` 中是汇报用的 5 个数据集方向示例图，已经统一处理为 512 x 512，并在 Beamer 中按两页展示。
 
 需要保留的文件名：
 
-- `examples/overall.jpg`：整体公共数据集示例
-- `examples/member_a_boat_lake.jpg`：成员 A，山湖 + 小船
-- `examples/member_b_rain_mist.jpg`：成员 B，雾景 + 雨后氛围
-- `examples/member_c_bridge_village.jpg`：成员 C，小镇 + 建筑 + 桥
-- `examples/member_d_pine_sunset.jpg`：成员 D，森林 + 松树 + 粉紫日落
-- `examples/member_e_flowers_river.jpg`：成员 E，植物 + 花草 + 近景自然
+- `manual/style_a.png`：风格 1，山湖
+- `manual/style_b.png`：风格 2，雪景
+- `manual/style_c.png`：风格 3，小镇
+- `manual/style_d.png`：风格 4，日落
+- `manual/style_e.png`：风格 5，花草
 
-如果替换图片，建议使用 `.jpg` 格式，并保持文件名不变。
+如果替换图片，建议保持 `.png` 格式和文件名不变，并统一处理为 512 x 512。
