@@ -9,6 +9,14 @@ data/*
 *.zip
 sdxl_lora_course_report(1).pdf
 
+# Private local/remote run notes. Do not commit server names, SSH aliases, or
+# machine-specific paths.
+.private/
+private/
+local_runs/
+remote_runs/
+reports/private/
+
 # Large local model/cache/output artifacts
 models/
 outputs/

@@ -9,13 +9,13 @@ bash scripts/setup_conda_env.sh
 bash scripts/download_sdxl_base.sh
 ```
 
-远程或 NAS 路径：
+共享 GPU 机器或外部存储路径。下面用占位路径表示，实际路径不要写进仓库：
 
 ```bash
-CONDA_ENV_PREFIX=/mnt/nas-new/valencia/sdxl-style-lora/.conda/sdxl-lora \
+CONDA_ENV_PREFIX=/path/to/project/.conda/sdxl-lora \
   bash scripts/setup_conda_env.sh
 
-MODEL_DIR=/mnt/nas-new/valencia/sdxl-style-lora/models/sdxl-base-1.0 \
+MODEL_DIR=/path/to/project/models/sdxl-base-1.0 \
   bash scripts/download_sdxl_base.sh
 ```
 
@@ -27,7 +27,7 @@ find data/Ghibli data/persona_5 data/EVA_rei -maxdepth 1 -type f | sort | head
 find outputs/sdxl_lora -maxdepth 2 -name training_metadata.json -print
 ```
 
-如果远程已经有同名 `outputs/sdxl_lora/<style>`，先确认是不是要覆盖。正常情况下不要覆盖 final 输出，换一个 output dir 或先备份。
+如果共享机器上已经有同名 `outputs/sdxl_lora/<style>`，先确认是不是要覆盖。正常情况下不要覆盖 final 输出，换一个 output dir 或先备份。
 
 ## 正式训练命令
 
@@ -127,30 +127,23 @@ outputs/sdxl_lora/<style>/
   --lora-scale 0.65
 ```
 
-## 远程同步
+## 共享机器同步
 
-当前常用远程路径：
-
-```text
-fstqwq:~/valencia/sdxl-style-lora
-```
-
-同步脚本：
+同步脚本时用你自己的 SSH alias 和项目路径。不要把真实主机名或绝对路径写入 git：
 
 ```bash
-rsync -av scripts/ training_scripts/ fstqwq:~/valencia/sdxl-style-lora/
+rsync -av scripts/ training_scripts/ <ssh-alias>:/path/to/project/
 ```
 
 拉回评估图：
 
 ```bash
-rsync -av fstqwq:~/valencia/sdxl-style-lora/outputs/eval_persona_5/ \
+rsync -av <ssh-alias>:/path/to/project/outputs/eval_persona_5/ \
   outputs/remote_eval_persona_5/
 ```
 
-让 Codex 操作远程时，最好明确：
+让 Codex 操作共享机器时，最好明确：
 
 ```text
-先 ssh fstqwq，检查 ~/valencia/sdxl-style-lora、nvidia-smi 和 logs，不要直接覆盖已有 outputs。
+先 ssh 到目标机器，检查项目目录、nvidia-smi 和 logs，不要直接覆盖已有 outputs；不要把主机名和绝对路径写进仓库。
 ```
-

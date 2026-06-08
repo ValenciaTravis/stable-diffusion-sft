@@ -31,13 +31,13 @@ models/sdxl-base-1.0
 HF_ENDPOINT=https://hf-mirror.com
 ```
 
-如果在远程机器或 NAS 上跑，可以显式指定路径：
+如果在共享 GPU 机器或外部存储上跑，可以显式指定路径。下面用占位路径表示，实际路径不要写进仓库：
 
 ```bash
-CONDA_ENV_PREFIX=/mnt/nas-new/valencia/sdxl-style-lora/.conda/sdxl-lora \
+CONDA_ENV_PREFIX=/path/to/project/.conda/sdxl-lora \
   bash scripts/setup_conda_env.sh
 
-MODEL_DIR=/mnt/nas-new/valencia/sdxl-style-lora/models/sdxl-base-1.0 \
+MODEL_DIR=/path/to/project/models/sdxl-base-1.0 \
   bash scripts/download_sdxl_base.sh
 ```
 
@@ -156,7 +156,7 @@ SEED_BASE=1234 WIDTH=1024 HEIGHT=1024 STEPS=30 bash experiments/run_report_exper
 ```
 
 ```text
-请在 fstqwq 的 ~/valencia/sdxl-style-lora 下训练 persona_5，先检查 nvidia-smi 和已有输出，不要覆盖正在跑的任务。
+请在共享 GPU 机器的项目目录下训练 persona_5，先检查 nvidia-smi 和已有输出，不要覆盖正在跑的任务。不要把主机名或绝对路径写进 git。
 ```
 
 ```text

@@ -34,7 +34,7 @@ clone 仓库后，可以让 Codex 按下面的话继续：
 如果要跑正式报告图：
 
 ```text
-请在远程 4090 机器上用 SEED_BASE=1234 WIDTH=1024 HEIGHT=1024 STEPS=30 运行完整 report experiments，然后把 outputs/report_experiments/seed_1234 拉回本地。
+请在共享 GPU 机器上用 SEED_BASE=1234 WIDTH=1024 HEIGHT=1024 STEPS=30 运行完整 report experiments，然后把 outputs/report_experiments/seed_1234 拉回本地。不要把主机名和绝对路径写进仓库。
 ```
 
 ## 报告结构
