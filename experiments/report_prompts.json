@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "description": "Prompt and variant definitions for the SDXL anime portrait LoRA course report.",
+  "styles": {
+    "ghibli": {
+      "label": "Ghibli style",
+      "lora_dir": "outputs/sdxl_lora/ghibli",
+      "token": "<ghibli_headshot>"
+    },
+    "persona_5": {
+      "label": "Persona 5 style",
+      "lora_dir": "outputs/sdxl_lora/persona_5",
+      "token": "<persona_5_headshot>"
+    },
+    "eva_rei": {
+      "label": "Ayanami Rei identity",
+      "lora_dir": "outputs/sdxl_lora/eva_rei",
+      "token": "<eva_rei_headshot>"
+    }
+  },
+  "merge_variants": {
+    "equal": {
+      "label": "equal 1:1:1",
+      "lora_dir": "outputs/sdxl_lora/report_merge_equal_keep",
+      "weights": {
+        "ghibli": 1.0,
+        "persona_5": 1.0,
+        "eva_rei": 1.0
+      }
+    },
+    "ghibli_heavy": {
+      "label": "ghibli-heavy 0.6/0.2/0.2",
+      "lora_dir": "outputs/sdxl_lora/report_merge_ghibli_heavy_keep",
+      "weights": {
+        "ghibli": 0.6,
+        "persona_5": 0.2,
+        "eva_rei": 0.2
+      }
+    },
+    "persona_heavy": {
+      "label": "persona-heavy 0.2/0.6/0.2",
+      "lora_dir": "outputs/sdxl_lora/report_merge_persona_heavy_keep",
+      "weights": {
+        "ghibli": 0.2,
+        "persona_5": 0.6,
+        "eva_rei": 0.2
+      }
+    },
+    "rei_heavy": {
+      "label": "rei-heavy 0.2/0.2/0.6",
+      "lora_dir": "outputs/sdxl_lora/report_merge_rei_heavy_keep",
+      "weights": {
+        "ghibli": 0.2,
+        "persona_5": 0.2,
+        "eva_rei": 0.6
+      }
+    }
+  },
+  "experiments": {
+    "base_vs_single": {
+      "title": "Original SDXL vs single LoRA",
+      "prompts": [
+        {
+          "prompt_id": "ghibli_forest",
+          "style": "ghibli",
+          "base_prompt": "close-up portrait of a young anime girl in a soft forest background, warm hand painted animation style",
+          "lora_prompt": "<ghibli_headshot>, close-up portrait of a young anime girl in a soft forest background, warm hand painted animation style"
+        },
+        {
+          "prompt_id": "ghibli_sky",
+          "style": "ghibli",
+          "base_prompt": "close-up portrait of a teenage anime character under a blue sky, gentle cinematic lighting",
+          "lora_prompt": "<ghibli_headshot>, close-up portrait of a teenage anime character under a blue sky, gentle cinematic lighting"
+        },
+        {
+          "prompt_id": "persona_thief",
+          "style": "persona_5",
+          "base_prompt": "close-up portrait of a stylish anime thief, red and black graphic poster background, sharp cel shading",
+          "lora_prompt": "<persona_5_headshot>, close-up portrait of a stylish anime thief, red and black graphic poster background, sharp cel shading"
+        },
+        {
+          "prompt_id": "persona_school",
+          "style": "persona_5",
+          "base_prompt": "black haired anime boy in a school uniform, dramatic red shadow behind him, bold graphic colors",
+          "lora_prompt": "<persona_5_headshot>, black haired anime boy in a school uniform, dramatic red shadow behind him, bold graphic colors"
+        },
+        {
+          "prompt_id": "rei_plugsuit",
+          "style": "eva_rei",
+          "base_prompt": "close-up portrait of Ayanami Rei with blue hair and red eyes wearing a white plugsuit, clean classic anime style",
+          "lora_prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei with blue hair and red eyes wearing a white plugsuit, clean classic anime style"
+        },
+        {
+          "prompt_id": "rei_uniform",
+          "style": "eva_rei",
+          "base_prompt": "Ayanami Rei in a school uniform, calm expression, pale background, clean anime character art",
+          "lora_prompt": "<eva_rei_headshot>, Ayanami Rei in a school uniform, calm expression, pale background, clean anime character art"
+        }
+      ]
+    },
+    "scale_sweep": {
+      "title": "LoRA scale sensitivity",
+      "scales": [0.4, 0.55, 0.65, 0.75, 0.9],
+      "prompts": [
+        {
+          "prompt_id": "ghibli_representative",
+          "style": "ghibli",
+          "prompt": "<ghibli_headshot>, close-up anime portrait, soft forest background, warm hand painted lighting"
+        },
+        {
+          "prompt_id": "persona_representative",
+          "style": "persona_5",
+          "prompt": "<persona_5_headshot>, red haired anime thief in a black outfit, bold red and black graphic poster background"
+        },
+        {
+          "prompt_id": "rei_representative",
+          "style": "eva_rei",
+          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei, blue hair, red eyes, clean classic anime style"
+        }
+      ]
+    },
+    "checkpoint_dynamics": {
+      "title": "Checkpoint dynamics",
+      "checkpoints": ["checkpoint-200", "checkpoint-600", "checkpoint-1000", "checkpoint-1400", "checkpoint-1800", "final"],
+      "prompts": [
+        {
+          "prompt_id": "ghibli_checkpoint",
+          "style": "ghibli",
+          "prompt": "<ghibli_headshot>, close-up anime portrait in a green forest, warm soft animation lighting"
+        },
+        {
+          "prompt_id": "persona_checkpoint",
+          "style": "persona_5",
+          "prompt": "<persona_5_headshot>, close-up anime thief portrait, bold red and black graphic poster composition"
+        },
+        {
+          "prompt_id": "rei_checkpoint",
+          "style": "eva_rei",
+          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei in a white plugsuit, blue hair, red eyes"
+        }
+      ]
+    },
+    "generalization": {
+      "title": "Cross-prompt generalization",
+      "prompts": [
+        {
+          "prompt_id": "ghibli_in_domain",
+          "style": "ghibli",
+          "domain": "in_domain",
+          "prompt": "<ghibli_headshot>, close-up portrait of a young anime girl in a green garden, soft painterly background"
+        },
+        {
+          "prompt_id": "ghibli_out_domain",
+          "style": "ghibli",
+          "domain": "out_of_domain",
+          "prompt": "<ghibli_headshot>, futuristic anime pilot wearing a silver flight jacket inside a neon city cockpit, soft hand painted style"
+        },
+        {
+          "prompt_id": "persona_in_domain",
+          "style": "persona_5",
+          "domain": "in_domain",
+          "prompt": "<persona_5_headshot>, stylish anime thief wearing a black coat, red and black graphic background"
+        },
+        {
+          "prompt_id": "persona_out_domain",
+          "style": "persona_5",
+          "domain": "out_of_domain",
+          "prompt": "<persona_5_headshot>, anime astronaut portrait on a moon base, red and black graphic poster style"
+        },
+        {
+          "prompt_id": "rei_in_domain",
+          "style": "eva_rei",
+          "domain": "in_domain",
+          "prompt": "<eva_rei_headshot>, Ayanami Rei in a white plugsuit, calm expression, blue hair, red eyes"
+        },
+        {
+          "prompt_id": "rei_out_domain",
+          "style": "eva_rei",
+          "domain": "out_of_domain",
+          "prompt": "<eva_rei_headshot>, Ayanami Rei wearing a black winter coat in a snowy city street, blue hair, red eyes"
+        }
+      ]
+    },
+    "multitoken_merge": {
+      "title": "Multi-token merge control",
+      "merge_variant": "equal",
+      "prompts": [
+        {
+          "prompt_id": "merge_rei_only",
+          "role": "rei_only",
+          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei, blue hair, red eyes, clean classic anime style"
+        },
+        {
+          "prompt_id": "merge_persona_only",
+          "role": "persona_only",
+          "prompt": "<persona_5_headshot>, close-up anime thief portrait, red and black graphic poster style"
+        },
+        {
+          "prompt_id": "merge_ghibli_only",
+          "role": "ghibli_only",
+          "prompt": "<ghibli_headshot>, close-up anime portrait, soft forest background, warm hand painted style"
+        },
+        {
+          "prompt_id": "rei_on_persona",
+          "role": "rei_on_persona",
+          "prompt": "<eva_rei_headshot>, <persona_5_headshot>, Ayanami Rei as a stylish anime thief, blue hair, red eyes, red and black graphic poster style"
+        },
+        {
+          "prompt_id": "rei_on_ghibli",
+          "role": "rei_on_ghibli",
+          "prompt": "<eva_rei_headshot>, <ghibli_headshot>, Ayanami Rei in a soft forest background, blue hair, red eyes, warm hand painted animation style"
+        }
+      ]
+    },
+    "merge_weights": {
+      "title": "Merge weight ratio sensitivity",
+      "merge_variants": ["equal", "ghibli_heavy", "persona_heavy", "rei_heavy"],
+      "prompts": [
+        {
+          "prompt_id": "weights_rei_only",
+          "role": "rei_only",
+          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei, blue hair, red eyes, clean anime style"
+        },
+        {
+          "prompt_id": "weights_rei_on_persona",
+          "role": "rei_on_persona",
+          "prompt": "<eva_rei_headshot>, <persona_5_headshot>, Ayanami Rei in a black thief outfit, blue hair, red eyes, bold red and black graphic poster style"
+        },
+        {
+          "prompt_id": "weights_rei_on_ghibli",
+          "role": "rei_on_ghibli",
+          "prompt": "<eva_rei_headshot>, <ghibli_headshot>, Ayanami Rei walking through a bright green forest, blue hair, red eyes, soft hand painted animation style"
+        },
+        {
+          "prompt_id": "weights_general_portrait",
+          "role": "general_portrait",
+          "prompt": "<ghibli_headshot>, <persona_5_headshot>, close-up portrait of an original anime character, energetic expression, mixed graphic and painterly style"
+        }
+      ]
+    }
+  }
+}
+

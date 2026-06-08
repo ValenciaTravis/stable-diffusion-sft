@@ -35,6 +35,8 @@ Each image should have a same-stem `.txt` caption. `metadata.csv` is useful for 
 - Preserve user edits in data captions. If an image is blurry or off-style, report it rather than deleting it.
 - For merge experiments, prefer `--method concat --embed-merge keep` when the user wants separate trigger-token control.
 - For report comparisons, keep prompt, seed, resolution, scheduler, guidance scale, and LoRA scale explicit in the saved metadata.
+- Maintain `reports/report_plan.md` while working on the course report. It is the handoff plan for future Codex sessions.
+- Report experiments are launched through `experiments/run_report_experiments.sh`; use `DRY_RUN=1` before a full run.
 
 ## Remote Convention
 
@@ -51,4 +53,3 @@ The remote conda env is usually:
 ```
 
 Verify these paths live before relying on them.
-
