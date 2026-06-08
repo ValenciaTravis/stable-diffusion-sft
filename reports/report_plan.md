@@ -12,10 +12,41 @@
 - [x] 建立报告草稿：`reports/course_report.md`。
 - [x] 完成 dry-run 验证：`SEED_BASE=1234` 时完整计划包含 144 张图，使用种子 `1234` 和 `1235`。
 - [x] 完成子实验 dry-run 验证：`EXPERIMENTS=multitoken_merge SEED_BASE=2222` 时计划包含 10 张图。
-- [ ] 跑完整实验并生成图片。
+- [x] 跑完整实验并生成图片：`SEED_BASE=20260608`，共 144 张 PNG，6 张实验 contact sheet 和 1 个 index。
 - [ ] 根据生成图填写每个实验的观察表。
 - [ ] 从 contact sheet 中挑选报告主图。
 - [ ] 写最终结论并清理 TODO。
+
+## 当前实验产物
+
+本轮完整实验使用：
+
+```text
+SEED_BASE=20260608
+WIDTH=1024
+HEIGHT=1024
+STEPS=30
+GUIDANCE_SCALE=7.5
+DEFAULT_LORA_SCALE=0.65
+```
+
+本地产物路径：
+
+```text
+outputs/report_experiments/seed_20260608/
+outputs/report_experiments/seed_20260608/all_metadata.json
+outputs/report_experiments/seed_20260608/run_plan.json
+outputs/report_experiments/seed_20260608/contact_sheets/
+```
+
+完整性检查：
+
+```text
+run_plan tasks: 144
+metadata images: 144
+generated PNG files: 144
+contact sheets: base_vs_single, scale_sweep, checkpoint_dynamics, generalization, multitoken_merge, merge_weights
+```
 
 ## 推荐 Codex 指令
 
