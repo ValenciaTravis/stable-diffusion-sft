@@ -14,7 +14,7 @@
 - [x] 完成子实验 dry-run 验证：`EXPERIMENTS=multitoken_merge SEED_BASE=2222` 时计划包含 10 张图。
 - [x] 跑完整实验并生成图片：`SEED_BASE=20260608`，共 144 张 PNG。
 - [x] 根据生成图填写每个实验的观察表。
-- [x] 使用 17 张拆分后的结果图作为报告主图，并放在 `reports/figures/` 供 Markdown 直接嵌入。
+- [x] 使用报告图作为 Markdown 嵌入图，其中 5.1 和 5.4 采用三风格六列合并图。
 - [x] 写最终结论并清理占位内容。
 
 ## 当前实验产物
@@ -45,16 +45,16 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 run_plan tasks: 144
 metadata images: 144
 generated PNG files: 144
-report figures: 17 split contact sheets in reports/figures/
+report figures: 13 contact sheets in reports/figures/
 ```
 
 报告已根据本轮结果图完成分析。当前仓库内报告图包括：
 
 ```text
-reports/figures/base_vs_single_{ghibli,persona_5,eva_rei}.jpg
+reports/figures/base_vs_single_6col.jpg
 reports/figures/scale_sweep_{ghibli,persona_5,eva_rei}.jpg
 reports/figures/checkpoint_dynamics_{ghibli,persona_5,eva_rei}.jpg
-reports/figures/generalization_{ghibli,persona_5,eva_rei}.jpg
+reports/figures/generalization_6col.jpg
 reports/figures/multitoken_merge.jpg
 reports/figures/merge_weights_{rei_only,rei_on_persona,rei_on_ghibli,general_portrait}.jpg
 ```
@@ -108,7 +108,7 @@ clone 仓库后，可以让 Codex 按下面的话继续：
 
 ```text
 outputs/report_experiments/seed_<SEED_BASE>/base_vs_single/
-outputs/report_experiments/seed_<SEED_BASE>/contact_sheets/base_vs_single_{ghibli,persona_5,eva_rei}.jpg
+outputs/report_experiments/seed_<SEED_BASE>/contact_sheets/base_vs_single_6col.jpg
 ```
 
 报告要回答：

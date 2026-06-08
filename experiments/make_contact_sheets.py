@@ -144,6 +144,21 @@ def draw_centered_text(
         y += line_height + 4
 
 
+def wrap_text_pixels(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont, max_width: int) -> list[str]:
+    lines: list[str] = []
+    line = ""
+    for word in text.split():
+        trial = word if not line else f"{line} {word}"
+        if draw.textlength(trial, font=font) <= max_width or not line:
+            line = trial
+        else:
+            lines.append(line)
+            line = word
+    if line:
+        lines.append(line)
+    return lines
+
+
 def paste_image(sheet: Image.Image, image_path: Path, box: tuple[int, int, int, int]) -> None:
     if not image_path.exists():
         draw = ImageDraw.Draw(sheet)
@@ -230,6 +245,232 @@ def make_matrix_sheet(
     sheet.save(output_path, quality=92)
 
 
+def make_base_vs_single_6col_sheet(
+    records: list[dict[str, Any]],
+    output_path: Path,
+    *,
+    image_path: Callable[[dict[str, Any]], Path],
+    thumb_size: int = 230,
+    margin: int = 14,
+) -> None:
+    records = [record for record in records if record["experiment_id"] == "base_vs_single"]
+    if not records:
+        return
+
+    title_font = load_font(30, bold=True)
+    style_font = load_font(22, bold=True)
+    col_font = load_font(21, bold=True)
+    prompt_font = load_font(13)
+
+    styles = [
+        style
+        for style in STYLE_ORDER
+        if any((record.get("metadata") or {}).get("style") == style for record in records)
+    ]
+    seeds = ordered_values([record["seed"] for record in records])
+
+    prompt_ids_by_style: dict[str, list[str]] = {}
+    prompt_lookup: dict[tuple[str, str], str] = {}
+    record_lookup: dict[tuple[str, str, str, int], dict[str, Any]] = {}
+    for style in styles:
+        prompt_ids: list[str] = []
+        for record in records:
+            metadata = record.get("metadata") or {}
+            if metadata.get("style") != style:
+                continue
+            comparison = metadata.get("comparison")
+            prompt_id = record["prompt_id"]
+            if prompt_id not in prompt_ids:
+                prompt_ids.append(prompt_id)
+            record_lookup[(style, comparison, prompt_id, record["seed"])] = record
+            if comparison == "single_lora":
+                prompt_lookup[(style, prompt_id)] = record["prompt"]
+        prompt_ids_by_style[style] = prompt_ids
+
+    prompt_count = max(len(prompt_ids) for prompt_ids in prompt_ids_by_style.values())
+    rows = [(prompt_idx, seed) for prompt_idx in range(prompt_count) for seed in seeds]
+
+    pair_width = thumb_size * 2
+    col_count = len(styles) * 2
+    title_height = 52
+    style_height = 36
+    col_height = 40
+
+    probe = Image.new("RGB", (10, 10), "white")
+    probe_draw = ImageDraw.Draw(probe)
+    max_prompt_lines = 1
+    for prompt in prompt_lookup.values():
+        max_prompt_lines = max(max_prompt_lines, len(wrap_text_pixels(probe_draw, prompt, prompt_font, pair_width - 18)))
+    prompt_line_height = 16
+    prompt_height = max(58, max_prompt_lines * prompt_line_height + 14)
+
+    width = margin * 2 + col_count * thumb_size
+    height = margin * 2 + title_height + style_height + col_height + len(rows) * (thumb_size + prompt_height)
+    sheet = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(sheet)
+
+    draw.text((margin, margin + 4), "5.1 Base SDXL vs Single LoRA", fill="#111111", font=title_font)
+
+    x0 = margin
+    style_y = margin + title_height
+    col_y = style_y + style_height
+    grid_y = col_y + col_height
+
+    for style_idx, style in enumerate(styles):
+        gx0 = x0 + style_idx * pair_width
+        gx1 = gx0 + pair_width
+        draw.rectangle((gx0, style_y, gx1, col_y), fill="#f1f1f1", outline="#cccccc")
+        draw_centered_text(draw, (gx0, style_y, gx1, col_y), STYLE_LABELS.get(style, style), style_font)
+
+    for style_idx, _style in enumerate(styles):
+        for offset, comparison in enumerate(COMPARISON_ORDER):
+            cx0 = x0 + style_idx * pair_width + offset * thumb_size
+            cx1 = cx0 + thumb_size
+            draw.rectangle((cx0, col_y, cx1, grid_y), fill="#eeeeee", outline="#c9c9c9")
+            draw_centered_text(draw, (cx0, col_y, cx1, grid_y), COMPARISON_LABELS.get(comparison, comparison), col_font)
+
+    current_y = grid_y
+    for prompt_idx, seed in rows:
+        image_y = current_y
+        prompt_y = image_y + thumb_size
+
+        for style_idx, style in enumerate(styles):
+            prompt_ids = prompt_ids_by_style[style]
+            if prompt_idx >= len(prompt_ids):
+                continue
+            prompt_id = prompt_ids[prompt_idx]
+            for offset, comparison in enumerate(COMPARISON_ORDER):
+                cx0 = x0 + style_idx * pair_width + offset * thumb_size
+                cx1 = cx0 + thumb_size
+                draw.rectangle((cx0, image_y, cx1, image_y + thumb_size), outline="#d0d0d0")
+                record = record_lookup.get((style, comparison, prompt_id, seed))
+                if record is not None:
+                    paste_image(sheet, image_path(record), (cx0 + 2, image_y + 2, cx1 - 2, image_y + thumb_size - 2))
+
+        for style_idx, style in enumerate(styles):
+            prompt_ids = prompt_ids_by_style[style]
+            if prompt_idx >= len(prompt_ids):
+                continue
+            prompt = prompt_lookup.get((style, prompt_ids[prompt_idx]), "")
+            gx0 = x0 + style_idx * pair_width
+            gx1 = gx0 + pair_width
+            draw.rectangle((gx0, prompt_y, gx1, prompt_y + prompt_height), fill="#f7f7f7", outline="#d0d0d0")
+            y = prompt_y + 7
+            for line in wrap_text_pixels(draw, prompt, prompt_font, pair_width - 18):
+                draw.text((gx0 + 8, y), line, fill="#222222", font=prompt_font)
+                y += prompt_line_height
+
+        current_y += thumb_size + prompt_height
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(output_path, quality=92)
+
+
+def make_generalization_6col_sheet(
+    records: list[dict[str, Any]],
+    output_path: Path,
+    *,
+    image_path: Callable[[dict[str, Any]], Path],
+    thumb_size: int = 230,
+    margin: int = 14,
+) -> None:
+    records = [record for record in records if record["experiment_id"] == "generalization"]
+    if not records:
+        return
+
+    title_font = load_font(30, bold=True)
+    style_font = load_font(22, bold=True)
+    col_font = load_font(21, bold=True)
+    prompt_font = load_font(12)
+
+    styles = [
+        style
+        for style in STYLE_ORDER
+        if any((record.get("metadata") or {}).get("style") == style for record in records)
+    ]
+    seeds = ordered_values([record["seed"] for record in records])
+
+    record_lookup: dict[tuple[str, str, int], dict[str, Any]] = {}
+    prompt_lookup: dict[tuple[str, str], str] = {}
+    for record in records:
+        metadata = record.get("metadata") or {}
+        style = metadata.get("style")
+        domain = metadata.get("domain")
+        if style is None or domain is None:
+            continue
+        record_lookup[(style, domain, record["seed"])] = record
+        prompt_lookup[(style, domain)] = record["prompt"]
+
+    pair_width = thumb_size * 2
+    col_count = len(styles) * 2
+    title_height = 52
+    style_height = 36
+    col_height = 40
+
+    probe = Image.new("RGB", (10, 10), "white")
+    probe_draw = ImageDraw.Draw(probe)
+    max_prompt_lines = 1
+    for prompt in prompt_lookup.values():
+        max_prompt_lines = max(max_prompt_lines, len(wrap_text_pixels(probe_draw, prompt, prompt_font, thumb_size - 18)))
+    prompt_line_height = 15
+    prompt_height = max(82, max_prompt_lines * prompt_line_height + 16)
+
+    width = margin * 2 + col_count * thumb_size
+    height = margin * 2 + title_height + style_height + col_height + len(seeds) * (thumb_size + prompt_height)
+    sheet = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(sheet)
+
+    draw.text((margin, margin + 4), "5.4 Cross-prompt Generalization", fill="#111111", font=title_font)
+
+    x0 = margin
+    style_y = margin + title_height
+    col_y = style_y + style_height
+    grid_y = col_y + col_height
+
+    for style_idx, style in enumerate(styles):
+        gx0 = x0 + style_idx * pair_width
+        gx1 = gx0 + pair_width
+        draw.rectangle((gx0, style_y, gx1, col_y), fill="#f1f1f1", outline="#cccccc")
+        draw_centered_text(draw, (gx0, style_y, gx1, col_y), STYLE_LABELS.get(style, style), style_font)
+
+    for style_idx, _style in enumerate(styles):
+        for offset, domain in enumerate(DOMAIN_ORDER):
+            cx0 = x0 + style_idx * pair_width + offset * thumb_size
+            cx1 = cx0 + thumb_size
+            draw.rectangle((cx0, col_y, cx1, grid_y), fill="#eeeeee", outline="#c9c9c9")
+            draw_centered_text(draw, (cx0, col_y, cx1, grid_y), DOMAIN_LABELS.get(domain, domain), col_font)
+
+    current_y = grid_y
+    for seed in seeds:
+        image_y = current_y
+        prompt_y = image_y + thumb_size
+
+        for style_idx, style in enumerate(styles):
+            for offset, domain in enumerate(DOMAIN_ORDER):
+                cx0 = x0 + style_idx * pair_width + offset * thumb_size
+                cx1 = cx0 + thumb_size
+                draw.rectangle((cx0, image_y, cx1, image_y + thumb_size), outline="#d0d0d0")
+                record = record_lookup.get((style, domain, seed))
+                if record is not None:
+                    paste_image(sheet, image_path(record), (cx0 + 2, image_y + 2, cx1 - 2, image_y + thumb_size - 2))
+
+        for style_idx, style in enumerate(styles):
+            for offset, domain in enumerate(DOMAIN_ORDER):
+                cx0 = x0 + style_idx * pair_width + offset * thumb_size
+                cx1 = cx0 + thumb_size
+                draw.rectangle((cx0, prompt_y, cx1, prompt_y + prompt_height), fill="#f7f7f7", outline="#d0d0d0")
+                prompt = prompt_lookup.get((style, domain), "")
+                y = prompt_y + 7
+                for line in wrap_text_pixels(draw, prompt, prompt_font, thumb_size - 18):
+                    draw.text((cx0 + 8, y), line, fill="#222222", font=prompt_font)
+                    y += prompt_line_height
+
+        current_y += thumb_size + prompt_height
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(output_path, quality=92)
+
+
 def group_by_style(records: list[dict[str, Any]], experiment_id: str) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for record in records:
@@ -255,23 +496,10 @@ def build_report_sheets(records: list[dict[str, Any]], output_dir: Path, metadat
     def image_path(record: dict[str, Any]) -> Path:
         return resolve_image_path(record, metadata_root)
 
-    for style, group in group_by_style(records, "base_vs_single").items():
-        path = output_dir / f"base_vs_single_{style}.jpg"
-        make_matrix_sheet(
-            group,
-            path,
-            title=f"Base SDXL vs LoRA: {STYLE_LABELS.get(style, style)}",
-            row_key=lambda r: (r["prompt_id"], r["seed"]),
-            row_label=lambda key: f"{PROMPT_LABELS.get(key[0], key[0])}\n{seed_label(key[1])}",
-            col_key=lambda r: (r.get("metadata") or {}).get("comparison"),
-            col_label=lambda key: COMPARISON_LABELS.get(key, str(key)),
-            image_path=image_path,
-            row_order=[],
-            col_order=COMPARISON_ORDER,
-            thumb_size=thumb_size,
-            row_label_width=170,
-        )
-        outputs.append(path)
+    if any(record["experiment_id"] == "base_vs_single" for record in records):
+        base_vs_single_path = output_dir / "base_vs_single_6col.jpg"
+        make_base_vs_single_6col_sheet(records, base_vs_single_path, image_path=image_path)
+        outputs.append(base_vs_single_path)
 
     for style, group in group_by_style(records, "scale_sweep").items():
         path = output_dir / f"scale_sweep_{style}.jpg"
@@ -307,22 +535,10 @@ def build_report_sheets(records: list[dict[str, Any]], output_dir: Path, metadat
         )
         outputs.append(path)
 
-    for style, group in group_by_style(records, "generalization").items():
-        path = output_dir / f"generalization_{style}.jpg"
-        make_matrix_sheet(
-            group,
-            path,
-            title=f"Cross-prompt Generalization: {STYLE_LABELS.get(style, style)}",
-            row_key=lambda r: r["seed"],
-            row_label=seed_label,
-            col_key=lambda r: (r.get("metadata") or {}).get("domain"),
-            col_label=lambda key: DOMAIN_LABELS.get(key, str(key)),
-            image_path=image_path,
-            col_order=DOMAIN_ORDER,
-            thumb_size=thumb_size,
-            row_label_width=150,
-        )
-        outputs.append(path)
+    if any(record["experiment_id"] == "generalization" for record in records):
+        generalization_path = output_dir / "generalization_6col.jpg"
+        make_generalization_6col_sheet(records, generalization_path, image_path=image_path)
+        outputs.append(generalization_path)
 
     multitoken = [record for record in records if record["experiment_id"] == "multitoken_merge"]
     if multitoken:

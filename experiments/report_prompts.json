@@ -153,7 +153,7 @@
           "prompt_id": "ghibli_out_domain",
           "style": "ghibli",
           "domain": "out_of_domain",
-          "prompt": "<ghibli_headshot>, futuristic anime pilot wearing a silver flight jacket inside a neon city cockpit, soft hand painted style"
+          "prompt": "<ghibli_headshot>, close-up portrait of a young mechanic inside a cozy airship workshop, brass tools, cloudy sky outside, soft hand painted animation style"
         },
         {
           "prompt_id": "persona_in_domain",
@@ -165,7 +165,7 @@
           "prompt_id": "persona_out_domain",
           "style": "persona_5",
           "domain": "out_of_domain",
-          "prompt": "<persona_5_headshot>, anime astronaut portrait on a moon base, red and black graphic poster style"
+          "prompt": "<persona_5_headshot>, stylish anime detective in a black coat, red gloves, neon city background, bold red and black graphic poster style"
         },
         {
           "prompt_id": "rei_in_domain",
@@ -240,4 +240,3 @@
     }
   }
 }
-

@@ -1,14 +1,10 @@
 # Contact Sheets
 
-- [base_vs_single_eva_rei.jpg](base_vs_single_eva_rei.jpg)
-- [base_vs_single_ghibli.jpg](base_vs_single_ghibli.jpg)
-- [base_vs_single_persona_5.jpg](base_vs_single_persona_5.jpg)
+- [base_vs_single_6col.jpg](base_vs_single_6col.jpg)
 - [checkpoint_dynamics_eva_rei.jpg](checkpoint_dynamics_eva_rei.jpg)
 - [checkpoint_dynamics_ghibli.jpg](checkpoint_dynamics_ghibli.jpg)
 - [checkpoint_dynamics_persona_5.jpg](checkpoint_dynamics_persona_5.jpg)
-- [generalization_eva_rei.jpg](generalization_eva_rei.jpg)
-- [generalization_ghibli.jpg](generalization_ghibli.jpg)
-- [generalization_persona_5.jpg](generalization_persona_5.jpg)
+- [generalization_6col.jpg](generalization_6col.jpg)
 - [merge_weights_general_portrait.jpg](merge_weights_general_portrait.jpg)
 - [merge_weights_rei_on_ghibli.jpg](merge_weights_rei_on_ghibli.jpg)
 - [merge_weights_rei_on_persona.jpg](merge_weights_rei_on_persona.jpg)

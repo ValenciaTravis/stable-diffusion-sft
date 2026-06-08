@@ -107,7 +107,7 @@ SEED_BASE=20260608 WIDTH=1024 HEIGHT=1024 STEPS=30 bash experiments/run_report_e
 outputs/report_experiments/seed_20260608/contact_sheets/
 ```
 
-为方便直接阅读 Markdown，报告中使用的 17 张结果图已生成到 `reports/figures/` 并在对应实验小节中嵌入。图中的标签只保留关键变量；完整 prompt 定义见 `experiments/report_prompts.json`。
+为方便直接阅读 Markdown，报告中使用的结果图已生成到 `reports/figures/` 并在对应实验小节中嵌入。图中的标签只保留关键变量；完整 prompt 定义见 `experiments/report_prompts.json`。
 
 ## 5. 实验结果
 
@@ -115,13 +115,9 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 
 目的：比较 base SDXL 和单风格 LoRA 在相同 prompt 和 seed 下的差异。
 
-结果图按风格拆分。图中列表示 `Base SDXL` 和 `LoRA`，行标签只保留 prompt 类型和 seed。
+结果图将三种风格放在同一张图中。每个风格占两列：`Base SDXL` 和 `LoRA`；每一行图片下方标注对应的 LoRA prompt。
 
-![Base SDXL vs LoRA: Ghibli](figures/base_vs_single_ghibli.jpg)
-
-![Base SDXL vs LoRA: Persona 5](figures/base_vs_single_persona_5.jpg)
-
-![Base SDXL vs LoRA: EVA Rei](figures/base_vs_single_eva_rei.jpg)
+![Base SDXL vs single LoRA](figures/base_vs_single_6col.jpg)
 
 | 对比 | 观察 | 结论 |
 |---|---|---|
@@ -185,18 +181,14 @@ checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint
 
 目的：比较 in-domain 和 out-of-domain prompt，判断 LoRA 是否只记住训练集构图。
 
-结果图按风格拆分。图中列表示 in-domain 和 out-of-domain prompt，行表示 seed。
+结果图将三种风格放在同一张图中。每个风格占两列：`in-domain` 和 `out-of-domain`；每一行图片下方标注对应 prompt。
 
-![Cross-prompt generalization: Ghibli](figures/generalization_ghibli.jpg)
-
-![Cross-prompt generalization: Persona 5](figures/generalization_persona_5.jpg)
-
-![Cross-prompt generalization: EVA Rei](figures/generalization_eva_rei.jpg)
+![Cross-prompt generalization](figures/generalization_6col.jpg)
 
 | 风格 | In-domain 表现 | Out-of-domain 表现 | 泛化结论 |
 |---|---|---|---|
-| Ghibli | 花园、森林、年轻角色这些接近训练分布的 prompt 表现稳定，颜色、眼睛和背景都很统一。 | 在“未来驾驶舱、霓虹城市”这种 prompt 下仍保留手绘动画感，但画面明显偏粉紫色，角色身份和场景细节不如 in-domain 稳定。 | Ghibli LoRA 学到的是可迁移画风，但在远离训练分布时会用色彩和线条覆盖 prompt 的一部分细节。 |
-| Persona 5 | thief、黑衣、红黑背景表现非常稳定，构图很接近 Persona 5 海报风格。 | astronaut 和 moon base prompt 下，部分 seed 仍有强烈黑白红图形风格，另一部分 seed 会变成更普通的科幻插画。 | Persona 5 LoRA 对同域 prompt 很强，对跨域 prompt 依赖 seed，风格迁移不如 Ghibli 和 Rei 稳定。 |
+| Ghibli | 花园、森林、年轻角色这些接近训练分布的 prompt 表现稳定，颜色、眼睛和背景都很统一。 | airship workshop prompt 下仍保留柔和手绘动画感，并能生成机械舱、黄铜工具和窗外天空等新场景元素。 | Ghibli LoRA 学到的是可迁移画风，在远离森林/花园场景时仍能保持风格，但人物形象会向训练集中的圆脸、少年感靠拢。 |
+| Persona 5 | thief、黑衣、红黑背景表现非常稳定，构图很接近 Persona 5 海报风格。 | detective prompt 下能保留黑衣、红手套、霓虹城市和红黑图形背景。 | Persona 5 LoRA 对同域 prompt 很强，换成 detective 这种相邻角色设定后仍能迁移，说明它不只是记住 thief 单一词。 |
 | EVA Rei | plugsuit、蓝发、红眼和冷淡表情都稳定出现。 | 冬季街景和黑色外套下仍能保留蓝发、红眼和 Rei 的冷静表情，只是服装按 prompt 改变。 | EVA Rei 是三个 LoRA 中泛化最稳定的一个，说明人物身份 token 比复杂风格 token 更容易跨场景保持。 |
 
 ### 5.5 Multi-token Merge 控制
@@ -261,7 +253,7 @@ rei-heavy = 0.2 / 0.2 / 0.6
 1. 单 LoRA 相比原始 SDXL 有明显效果。Ghibli LoRA 主要改变手绘动画质感，Persona 5 LoRA 提高红黑图形风格的一致性，EVA Rei LoRA 强化具体人物身份。
 2. `lora_scale=0.65` 是合理默认值。较低 scale 更保留 base SDXL 的多样性，较高 scale 风格更强但更容易出现构图模板化、背景拥挤或颜色过饱和。
 3. final checkpoint 不总是视觉上最优。三个 LoRA 都在中期 checkpoint 已经形成主要特征，final 更稳定但也更接近训练集偏好。
-4. 泛化能力因任务不同而不同。Rei 身份 token 最稳定，Ghibli 风格能迁移到新场景但会覆盖部分 prompt 细节，Persona 5 对红黑 thief 语境最强，跨到 astronaut 等场景时更依赖 seed。
+4. 泛化能力因任务不同而不同。Rei 身份 token 最稳定，Ghibli 风格能迁移到 airship workshop 这类新场景，Persona 5 对红黑 thief 语境最强，但在 detective 设定下也能保留图形化风格。
 5. Multi-token merge 可以在一个 adapter 中保留多个触发词，并能生成 Rei on Persona 5 和 Rei on Ghibli。但人物和风格并不完全解耦，组合时存在发色、背景、服装和线条风格之间的竞争。
 6. Merge 权重能改变整体倾向，但控制粒度有限。实际使用时，prompt token、LoRA scale 和 merge 权重需要一起调。
 
