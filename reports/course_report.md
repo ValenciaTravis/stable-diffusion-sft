@@ -101,13 +101,7 @@ W' = W + scale * B @ A
 SEED_BASE=20260608 WIDTH=1024 HEIGHT=1024 STEPS=30 bash experiments/run_report_experiments.sh
 ```
 
-原始推理产物位于：
-
-```text
-outputs/report_experiments/seed_20260608/contact_sheets/
-```
-
-为方便直接阅读 Markdown，报告中使用的结果图已生成到 `reports/figures/` 并在对应实验小节中嵌入。图中的标签只保留关键变量；完整 prompt 定义见 `experiments/report_prompts.json`。
+完整 prompt 配置保存在 `experiments/report_prompts.json`，报告中的对比图均由同一组 seed 和推理参数生成。
 
 ## 5. 实验结果
 
@@ -115,7 +109,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 
 目的：比较 base SDXL 和单风格 LoRA 在相同 prompt 和 seed 下的差异。
 
-结果图将三种风格放在同一张图中。每个风格占两列：`Base SDXL` 和 `LoRA`；每一行图片下方标注对应的 LoRA prompt。
+图 1 展示了三类数据集在原始 SDXL 与单 LoRA 下的直接对比。
 
 ![Base SDXL vs single LoRA](figures/base_vs_single_6col.jpg)
 
@@ -135,7 +129,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 0.4 / 0.55 / 0.65 / 0.75 / 0.9
 ```
 
-结果图按风格拆分。图中列表示 `lora_scale`，行表示 seed。
+图 2a-2c 展示了不同推理 scale 下三类 LoRA 的视觉变化。
 
 ![LoRA scale sweep: Ghibli](figures/scale_sweep_ghibli.jpg)
 
@@ -161,7 +155,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint-1800 / final
 ```
 
-结果图按风格拆分。图中列按训练顺序排列 checkpoint，行表示 seed。
+图 3a-3c 展示了从 `checkpoint-200` 到 final 的训练动态。
 
 ![Checkpoint dynamics: Ghibli](figures/checkpoint_dynamics_ghibli.jpg)
 
@@ -181,7 +175,7 @@ checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint
 
 目的：比较 in-domain 和 out-of-domain prompt，判断 LoRA 是否只记住训练集构图。
 
-结果图将三种风格放在同一张图中。每个风格占两列：`in-domain` 和 `out-of-domain`；每一行图片下方标注对应 prompt。
+图 4 比较了每个 LoRA 在训练分布附近 prompt 与跨场景 prompt 下的表现。
 
 ![Cross-prompt generalization](figures/generalization_6col.jpg)
 
@@ -202,7 +196,7 @@ checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint
 <eva_rei_headshot>, <ghibli_headshot>, Ayanami Rei ...
 ```
 
-结果图中每列表示一个 token 组合，每个 seed 的图片下方标注对应 prompt。
+图 5 展示了单 token 与多 token 组合在同一个 merged adapter 中的生成结果。
 
 ![Multi-token merge control](figures/multitoken_merge_prompts.jpg)
 
@@ -229,7 +223,7 @@ persona-heavy = 0.2 / 0.6 / 0.2
 rei-heavy = 0.2 / 0.2 / 0.6
 ```
 
-结果图采用 8 列布局：4 个 merge 权重设置，每个权重设置包含两个 seed；每一行图片下方标注对应 prompt。
+图 6 比较了不同 merge 权重下，人物身份与风格组合的变化。
 
 ![Merge weight ratio sensitivity](figures/merge_weights_8col.jpg)
 
